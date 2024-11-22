@@ -1,7 +1,7 @@
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const axios = require('axios');
-const punycode = require('punycode');
+
 
 
 
@@ -14,8 +14,40 @@ const client = new Client({
     }
 });
 
-let qrCodeData = ''; // Variable para almacenar el QR actual
 
+client.on('disconnected', (reason) => {
+    console.log('Cliente desconectado:', reason);
+    client.initialize(); // Intenta reconectar
+});
+
+let qrCodeData = ''; // Variable para almacenar el QR actual
+// Variable global para almacenar los números aleatorios
+let randomNumbers = generateRandomNumbers();
+
+// Función para generar 4 números aleatorios de dos dígitos
+function generateRandomNumbers() {
+    return Array.from({ length: 4 }, () => Math.floor(Math.random() * 90) + 10).join('-');
+}
+
+// Configuración para cambiar los números a las 5:00 AM
+function scheduleNumberUpdate() {
+    const now = new Date();
+    const next5AM = new Date();
+    next5AM.setHours(5, 0, 0, 0);
+    if (now > next5AM) {
+        next5AM.setDate(next5AM.getDate() + 1); // Programar para el día siguiente
+    }
+
+    const timeTo5AM = next5AM - now;
+    setTimeout(() => {
+        randomNumbers = generateRandomNumbers(); // Generar nuevos números
+        console.log('Números actualizados:', randomNumbers);
+        scheduleNumberUpdate(); // Volver a programar para el siguiente día
+    }, timeTo5AM);
+}
+
+// Llama a la función para programar la actualización inicial
+scheduleNumberUpdate();
 
 const userState = {};
 
@@ -209,10 +241,21 @@ const msg = message.body.trim().toLowerCase();
 
     if (!userState[chatId]) userState[chatId] = 'welcomeMenu';
 
-    if (msg === 'menu' || msg === 'hola' || msg === 'buenos días'|| msg === 'saludos'|| msg === 'klk'|| msg === 'Hi'|| msg === 'buenas tardes'|| msg === 'buenas noches'|| msg === '.'|| msg === 'okey') {
+    if (msg === 'menu' || msg === 'hola' || msg === 'buenos días'|| msg === 'saludos'|| msg === 'klk'|| msg === 'Hi'|| msg === 'buenas tardes'|| msg === 'buenas noches'|| msg === '.'|| msg === 'okey'|| msg === 'okay') {
         userState[chatId] = 'welcomeMenu';
         sendWelcomeMenu(message);
     }
+
+        // Nueva entrada: "chatsrd"
+        if (msg === 'chatsrd') {
+            message.reply(
+                `🌐 *ChatSRD*\n\n` +
+                `Números de la *Suerte*: *${randomNumbers}*\n\n` +
+                `¡Juega con responsabilidad!`
+            );
+            return;
+        }
+    
     else if (userState[chatId] === 'welcomeMenu') {
         if (msg === '1') {
             userState[chatId] = 'lotteryMenu';
