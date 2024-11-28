@@ -10,7 +10,12 @@ const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true, // Esto ejecuta Puppeteer sin abrir una ventana de navegador
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu'
+        ]
     }
 });
 
@@ -195,7 +200,7 @@ const fetchLatestLotteryResults = async (message, lotteryDescription) => {
                 `📅 Fecha: *${formattedDate}*\n\n` +
                 `1️⃣ En Primera: *${latestResult.num1}*\n` +
                 `2️⃣ En Segunda: *${latestResult.num2}*\n` +
-                `3️⃣ Entercera: *${latestResult.num3}*\n\n`+
+                `3️⃣ En tercera: *${latestResult.num3}*\n\n`+
                 `Somos *Sorteos RD*, tu canal de Loterías\n`+
                 `📣 *COMPARTE* este WhatsApp con tus contactos.\n`
                 
